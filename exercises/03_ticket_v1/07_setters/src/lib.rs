@@ -10,28 +10,51 @@ pub struct Ticket {
 }
 
 impl Ticket {
-    pub fn new(title: String, description: String, status: String) -> Ticket {
-        if title.is_empty() {
-            panic!("Title cannot be empty");
+        pub fn new(title: String, description: String, status: String) -> Ticket {
+            Ticket {
+                title: Self::validate_title(title),
+                description: Self::validate_description(description),
+                status: Self::validate_status(status),
+            }
         }
-        if title.len() > 50 {
-            panic!("Title cannot be longer than 50 bytes");
+    
+        fn validate_title(title: String) -> String {
+            if title.is_empty() {
+                panic!("Title cannot be empty");
+            }
+            if title.len() > 50 {
+                panic!("Title cannot be longer than 50 bytes");
+            }
+            title
         }
-        if description.is_empty() {
-            panic!("Description cannot be empty");
+    
+        fn validate_description(description: String) -> String {
+            if description.is_empty() {
+                panic!("Description cannot be empty");
+            }
+            if description.len() > 500 {
+                panic!("Description cannot be longer than 500 bytes");
+            }
+            description
         }
-        if description.len() > 500 {
-            panic!("Description cannot be longer than 500 bytes");
-        }
-        if status != "To-Do" && status != "In Progress" && status != "Done" {
-            panic!("Only `To-Do`, `In Progress`, and `Done` statuses are allowed");
+    
+        fn validate_status(status: String) -> String {
+            if status != "To-Do" && status != "In Progress" && status != "Done" {
+                panic!("Only `To-Do`, `In Progress`, and `Done` statuses are allowed");
+            }
+            status
         }
 
-        Ticket {
-            title,
-            description,
-            status,
-        }
+    pub fn set_title(&mut self, title: String) {
+        self.title = Self::validate_title(title);
+    }
+
+    pub fn set_description(&mut self, description: String) {
+        self.description = Self::validate_description(description);
+    }
+
+    pub fn set_status(&mut self, status: String) {
+        self.status = Self::validate_status(status);
     }
 
     pub fn title(&self) -> &String {
