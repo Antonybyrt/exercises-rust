@@ -1,19 +1,40 @@
-// TODO: Implement `Debug`, `Display` and `Error` for the `TicketNewError` enum.
-//  When implementing `Display`, you may want to use the `write!` macro from Rust's standard library.
-//  The docs for the `std::fmt` module are a good place to start and look for examples:
-//  https://doc.rust-lang.org/std/fmt/index.html#write
+use std::fmt::{self, Display, Formatter};
+use std::error::Error;
 
+#[derive(Debug, PartialEq)]
 enum TicketNewError {
     TitleError(String),
     DescriptionError(String),
 }
 
-// TODO: `easy_ticket` should panic when the title is invalid, using the error message
-//   stored inside the relevant variant of the `TicketNewError` enum.
-//   When the description is invalid, instead, it should use a default description:
-//   "Description not provided".
+impl Display for TicketNewError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            TicketNewError::TitleError(msg) => write!(f, "Title Error: {}", msg),
+            TicketNewError::DescriptionError(msg) => write!(f, "Description Error: {}", msg),
+        }
+    }
+}
+
+impl Error for TicketNewError {
+    fn description(&self) -> &str {
+        match self {
+            TicketNewError::TitleError(msg) => msg,
+            TicketNewError::DescriptionError(msg) => msg,
+        }
+    }
+}
+
 fn easy_ticket(title: String, description: String, status: Status) -> Ticket {
-    todo!()
+    match Ticket::new(title.clone(), description.clone(), status.clone()) {
+        Ok(ticket) => ticket,
+        Err(TicketNewError::TitleError(msg)) => panic!("{}", msg),
+        Err(TicketNewError::DescriptionError(_)) => Ticket {
+            title,
+            description: "Description not provided".to_string(),
+            status,
+        },
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -98,7 +119,7 @@ mod tests {
     #[test]
     fn display_is_correctly_implemented() {
         let ticket = Ticket::new("".into(), valid_description(), Status::ToDo);
-        assert_eq!(format!("{}", ticket.unwrap_err()), "Title cannot be empty");
+        assert_eq!(format!("{}", ticket.unwrap_err()), "Title Error: Title cannot be empty");
     }
 
     assert_impl_one!(TicketNewError: std::error::Error);
